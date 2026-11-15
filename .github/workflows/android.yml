@@ -1,51 +1,26 @@
-name: Build MAGMITE APK
+name: MAGMITE APK
 
-on:
- workflow_dispatch:
+on: [workflow_dispatch]
 
-permissions:
- contents: read
-
- jobs:
+jobs:
  build:
-runs-on: ubuntu-latest
+  runs-on: ubuntu-latest
+  steps:
+  - uses: actions/checkout@v4
 
-steps:
-  - name: Checkout repository
-    uses: actions/checkout@v4
+  - name: Extract project
+    run: unzip -o MAGMITE-AI-Voice-Reply-Fixed.zip -d project
 
-  - name: Check repository files
-    run: |
-      echo "=== Repository files ==="
-      find . -maxdepth 3 -type f | head -100
-
-  - name: Extract MAGMITE project
-    run: unzip -o "MAGMITE-AI-Voice-Reply-Fixed.zip" -d project
-
-  - name: Find Android project
-    run: |
-      echo "=== Searching for Android project ==="
-      find project -type f -name "settings.gradle" -o -name "settings.gradle.kts"
-
-  - name: Set up JDK 17
+  - name: Set up Java
     uses: actions/setup-java@v4
     with:
       distribution: temurin
       java-version: "17"
 
-  - name: Set up Gradle
-    uses: gradle/actions/setup-gradle@v4
-
-  - name: Build Debug APK
+  - name: Build APK
     run: |
-      PROJECT_FILE=$(find project -type f -name "settings.gradle" -o -name "settings.gradle.kts" | head -n 1)
-      if [ -z "$PROJECT_FILE" ]; then
-        echo "ERROR: Android project not found!"
-        exit 1
-      fi
-      PROJECT_DIR=$(dirname "$PROJECT_FILE")
-      echo "Building project from: $PROJECT_DIR"
-      cd "$PROJECT_DIR"
+      PROJECT=$(find project -name settings.gradle.kts | head -1)
+      cd "$(dirname "$PROJECT")"
       chmod +x gradlew
       ./gradlew assembleDebug --no-daemon
 
@@ -54,4 +29,3 @@ steps:
     with:
       name: MAGMITE-APK
       path: project/**/app/build/outputs/apk/debug/*.apk
-      if-no-files-found: error
