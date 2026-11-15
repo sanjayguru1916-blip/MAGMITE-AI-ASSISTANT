@@ -11,6 +11,11 @@ jobs:
   - name: Extract project
     run: unzip -o MAGMITE-AI-Voice-Reply-Fixed.zip -d project
 
+  - name: Check extracted files
+    run: |
+      echo "=== PROJECT FILES ==="
+      find project -maxdepth 4 -type f | head -100
+
   - name: Set up Java
     uses: actions/setup-java@v4
     with:
@@ -22,10 +27,7 @@ jobs:
 
   - name: Build APK
     run: |
-      PROJECT_FILE=$(find project -type f -name "settings.gradle" -o -name "settings.gradle.kts" | head -n 1)
-      PROJECT_DIR=$(dirname "$PROJECT_FILE")
-      echo "Building project from: $PROJECT_DIR"
-      cd "$PROJECT_DIR"
+      cd "$(dirname "$(find project -type f -name settings.gradle.kts -print -quit)")"
       gradle assembleDebug --no-daemon
 
   - name: Upload APK
