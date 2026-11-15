@@ -20,7 +20,7 @@ jobs:
           find . -maxdepth 3 -type f | head -100
 
       - name: Extract MAGMITE project
-        run: unzip -o "MAGMITE-AI-Floating-HUD-Updated.zip" -d project
+        run: unzip -o "MAGMITE-AI-Floating-HUD-Premium-Updated.zip" -d project
 
       - name: Find Android project
         run: |
